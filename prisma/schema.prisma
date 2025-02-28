@@ -13,44 +13,78 @@ datasource db {
   url      = env("SUPABASE_URL")
 }
 
+model Period {
+  id        String   @id @default(uuid())
+  startDate DateTime
+  endDate   DateTime
+  employees Employee[]
+  schedules Schedule[]
+  tasks     Task[]
+  tweets    Tweet[]
+}
+
 model Employee {
-  id         String    @id @default(uuid())
-  name       String  
-  position   String  
-  schedules  Schedule[]
-  tasks      Task[] 
-  messages   Message[]
+  id        String     @id @default(uuid())
+  name      String  
+  position  String  
+  periods   Period[] 
+  schedules Schedule[]
+  tasks     Task[] 
+  messages  Tweet[]
 }
 
 model Shift {
   id         String    @id @default(uuid())
-  name       String    
+  name       String
   schedules  Schedule[]
 }
 
 model Schedule {
-  id         String    @id @default(uuid())  
-  date       DateTime  
-  shiftId    String    
+  id         String    @id @default(uuid())
+  date       DateTime
+  shiftId    String
   shift      Shift     @relation(fields: [shiftId], references: [id])
-  employeeId String    
+  employeeId String
   employee   Employee  @relation(fields: [employeeId], references: [id])
+  periodId   String
+  period     Period    @relation(fields: [periodId], references: [id])
 }
 
 model Task {
-  id         String    @id @default(uuid())  
-  date       DateTime 
-  employeeId String    
+  id         String    @id @default(uuid())
+  date       DateTime
+  employeeId String
   employee   Employee  @relation(fields: [employeeId], references: [id])
-  description String  
+  periodId   String
+  period     Period    @relation(fields: [periodId], references: [id])
+  taskStatus String
+  description String
 }
 
-model Message {
-  id         String    @id @default(uuid())  
-  date       DateTime 
-  employeeId String    
-  employee   Employee  @relation(fields: [employeeId], references: [id])
-  platform   String   
-  content    String   
+model Tweet {
+  id          String   @id @default(uuid())
+  date        DateTime
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  firstTimeSt String
+  complTimeSt String
+  timestamp   String
+  connectProf String?
+  complBy     String
+  platform    String
+  content     String
+  nativeLink  String
+  permalink   String
+  periodId    String
+  period      Period   @relation(fields: [periodId], references: [id])
+  replies     TweetReply[]
 }
 
+model TweetReply {
+  id          String   @id @default(uuid())
+  tweetId     String
+  tweet       Tweet    @relation(fields: [tweetId], references: [id])
+  checkStatus String
+  standFormat String
+  comment     String?
+}
