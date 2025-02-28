@@ -46,6 +46,41 @@ export const useDataStore = defineStore('data', () => {
           })
 
           data.answersObj = filtered
+
+          const uploadData = async () => {
+            if (!data.length) {
+                console.log('no data')
+            }
+
+            try {
+
+                if (!data.scheduleObj?.length) {
+                    alert('Please put file with schedule');
+                    return;
+                };
+
+                const fromData = new FormData();
+
+                data.scheduleObj.forEach((item) => {
+                    fromData.append('schedule[]', JSON.stringify(item));
+                })
+
+                const fetchSchedule = await fetch('/api/period', {
+                    method: 'POST',
+                    body: fromData
+                })
+
+                const res = await fetchSchedule.json();
+
+                console.log(res, 'fetchSchedule')
+
+
+            } catch (err) {
+                console.log(err)
+            }
+          }
+
+          uploadData()
         }
       })
     }
