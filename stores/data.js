@@ -47,47 +47,75 @@ export const useDataStore = defineStore('data', () => {
 
           data.answersObj = filtered
 
-          console.log(data.scheduleObj, 'answersObj')
+          console.log(data, 'answersObj')
 
-          const uploadData = async () => {
+        //   const uploadData = async () => {
 
-            // console.log(scheduleObj, 'scheduleObj')
-            if (!data.length) {
-                console.log('no data')
+        //     // console.log(scheduleObj, 'scheduleObj')
+        //     if (!data.length) {
+        //         console.log('no data')
+        //     }
+
+        //     try {
+
+        //         if (!data.scheduleObj?.length) {
+        //             alert('Please put file with schedule');
+        //             return;
+        //         };
+
+        //         const fromData = new FormData();
+
+        // //   console.log(answersObj, 'answersObj')
+
+
+        //         data.scheduleObj.forEach((item) => {
+        //             fromData.append('schedule[]', JSON.stringify(item));
+        //         })
+
+        //         const fetchSchedule = await fetch('/api/period?period=schedule', {
+        //             method: 'POST',
+        //             body: fromData
+        //         })
+
+        //         const res = await fetchSchedule.json();
+
+        //         console.log(res, 'fetchSchedule')
+
+
+        //     } catch (err) {
+        //         console.log(err)
+        //     }
+        //   }
+
+        //   uploadData();
+
+          const uploadAnswers = async () => {
+
+            if (!data.answersObj?.length) {
+                alert('Some problem with answers file');
+                return;
             }
 
-            try {
+            const fromData = new FormData();
 
-                if (!data.scheduleObj?.length) {
-                    alert('Please put file with schedule');
-                    return;
-                };
+            data.answersObj.forEach((item) => {
+                fromData.append('answers[]', JSON.stringify(item));
+            })
 
-                const fromData = new FormData();
+            const fetchAnswers = await fetch('/api/period?period=answers', {
+                method: 'POST',
+                body: fromData
+            })
 
-        //   console.log(answersObj, 'answersObj')
+            const res = await fetchAnswers.json();
 
-
-                data.scheduleObj.forEach((item) => {
-                    fromData.append('schedule[]', JSON.stringify(item));
-                })
-
-                const fetchSchedule = await fetch('/api/period?period=schedule', {
-                    method: 'POST',
-                    body: fromData
-                })
-
-                const res = await fetchSchedule.json();
-
-                console.log(res, 'fetchSchedule')
+            console.log(res, 'fetchAnswers')
 
 
-            } catch (err) {
-                console.log(err)
-            }
+
           }
 
-          uploadData()
+          uploadAnswers();
         }
       })
     }

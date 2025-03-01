@@ -1,6 +1,9 @@
 import prisma from '../../../../prisma/prisma';
 import { readMultipartFormData } from '#imports';
+import { chunk } from 'lodash'
 import supabase from '#supabase'
+
+const chunkSize = 100;
 
 async function uploadSchedule(event) {
 
@@ -76,7 +79,7 @@ async function uploadSchedule(event) {
             dateKeys.forEach((key) => {
                 scheduleArr.push({
                     employeeId: employeeId,
-                    dates: key,
+                    dates: new Date(key).toISOString(),
                     shiftName: item[key]
                 })
             })
@@ -107,12 +110,43 @@ async function uploadSchedule(event) {
             // }
         })
 
-        const uploadSchedule = await prisma.schedule.createMany({
-            data: scheduleArr,
-            skipDuplicates: true
-        })
+        async function insertScheduleChunk(data) {
+            const chunks = [];
 
-        return {data: uploadSchedule}
+
+            for (let i = 0; i < data.length; i += chunkSize) {
+                chunks.push(data.slice(i, i + chunkSize));
+            }
+
+            for (const batch of chunks) {
+                try {
+                    await prisma.schedule.createMany({
+                        data: batch,
+                        skipDuplicates: true
+
+                    })
+
+                    console.log('inserted chunk');
+                    
+
+
+                } catch (err) {
+                    console.error('Error insert schedule', err.message)
+                }
+
+            }
+        }
+
+        await insertScheduleChunk(scheduleArr);
+
+
+
+        // const uploadSchedule = await prisma.schedule.createMany({
+        //     data: scheduleArr,
+        //     skipDuplicates: true
+        // })
+
+        return {data: insertScheduleChunk}
 
         // console.log()
 

@@ -19,7 +19,7 @@ model Period {
   endDate     DateTime
   employeeIds String[]
   employees   Employee[]
-  tasks       Task[]
+  // tasks       Task[]
   tweets      Tweet[]
 }
 
@@ -29,10 +29,10 @@ model Employee {
   position  String  
   email     String     @unique
   schedules Schedule[]
-  tasks     Task[] 
+  // tasks     Task[] 
   messages  Tweet[]
   periodId  String
-  period     Period    @relation(fields: [periodId], references: [id])
+  period     Period    @relation(fields: [periodId], references: [id], onDelete: Cascade)
 
 }
 
@@ -50,7 +50,7 @@ model Schedule {
   shiftName  String
   // shiftValue String
   employeeId String
-  employee   Employee  @relation(fields: [employeeId], references: [id])
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
 }
 
@@ -60,40 +60,41 @@ model Schedule {
 //   schedule    Schedule  @relation(fields: [scheduleId], references: [id])
 // }
 
-model Task {
-  id         String    @id @default(uuid())
-  date       DateTime
-  employeeId String
-  employee   Employee  @relation(fields: [employeeId], references: [id])
-  periodId   String
-  period     Period    @relation(fields: [periodId], references: [id])
-  taskStatus String
-  description String
-}
+// model Task {
+//   id         String    @id @default(uuid())
+//   date       DateTime
+//   employeeId String
+//   employee   Employee  @relation(fields: [employeeId], references: [id])
+//   periodId   String
+//   period     Period    @relation(fields: [periodId], references: [id])
+//   taskStatus String
+//   description String
+// }
 
 model Tweet {
   id          String   @id @default(uuid())
   date        DateTime
   employeeId  String
-  employee    Employee @relation(fields: [employeeId], references: [id])
-  firstTimeSt String
-  complTimeSt String
-  timestamp   String
-  connectProf String?
-  complBy     String
-  platform    String
-  content     String
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  firstTimeSt String  //First Reply Timestamp
+  taskStatus  String  //Task status
+  complTimeSt String // Complete Timestamp
+  timestamp   String // Timestamp
+  connectProf String? // Connected profile
+  complBy     String  // Completed By
+  network     String  // Network
+  message     String  // Message
   nativeLink  String
   permalink   String
   periodId    String
-  period      Period   @relation(fields: [periodId], references: [id])
+  period      Period   @relation(fields: [periodId], references: [id], onDelete: Cascade)
   replies     TweetReply[]
 }
 
 model TweetReply {
   id          String   @id @default(uuid())
   tweetId     String
-  tweet       Tweet    @relation(fields: [tweetId], references: [id])
+  tweet       Tweet    @relation(fields: [tweetId], references: [id], onDelete: Cascade)
   checkStatus String
   standFormat String
   comment     String?

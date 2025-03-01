@@ -1,5 +1,7 @@
 import { defineEventHandler } from "#imports";
+// import {uploadSchedule, } from "../services/methods/period";
 import uploadSchedule from "../services/methods/period/uploadSchedule";
+import uploadAnswers from "../services/methods/period/uploadAnswers";
     
 
 
@@ -17,6 +19,10 @@ export default defineEventHandler((event) => {
         case 'POST': 
             if (query.period === 'schedule') {
                 return uploadSchedule(event);
+            } else if (query.period === 'answers') {
+                console.log(1);
+                
+                return uploadAnswers(event);
             }
             // return {
             //     success: true,
