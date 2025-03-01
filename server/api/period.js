@@ -7,19 +7,24 @@ export default defineEventHandler((event) => {
     const method = event.node.req.method;
     const query = getQuery(event);
 
+    console.log(query.period, 'query')
+
     switch (method) {
         case 'GET':
             return console.log(1);
         break;
 
         case 'POST': 
-            return {
-                success: true,
-                data: {
-                    message: 'success',
-                    value: 1
-                }
-            };
+            if (query.period === 'schedule') {
+                return uploadSchedule(event);
+            }
+            // return {
+            //     success: true,
+            //     data: {
+            //         message: 'success',
+            //         value: 1
+            //     }
+            // };
 
         break;
 

@@ -47,7 +47,11 @@ export const useDataStore = defineStore('data', () => {
 
           data.answersObj = filtered
 
+          console.log(data.scheduleObj, 'answersObj')
+
           const uploadData = async () => {
+
+            // console.log(scheduleObj, 'scheduleObj')
             if (!data.length) {
                 console.log('no data')
             }
@@ -61,11 +65,14 @@ export const useDataStore = defineStore('data', () => {
 
                 const fromData = new FormData();
 
+        //   console.log(answersObj, 'answersObj')
+
+
                 data.scheduleObj.forEach((item) => {
                     fromData.append('schedule[]', JSON.stringify(item));
                 })
 
-                const fetchSchedule = await fetch('/api/period', {
+                const fetchSchedule = await fetch('/api/period?period=schedule', {
                     method: 'POST',
                     body: fromData
                 })

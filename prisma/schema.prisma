@@ -14,41 +14,51 @@ datasource db {
 }
 
 model Period {
-  id        String   @id @default(uuid())
-  startDate DateTime
-  endDate   DateTime
-  employees Employee[]
-  schedules Schedule[]
-  tasks     Task[]
-  tweets    Tweet[]
+  id          String   @id @default(uuid())
+  startDate   DateTime
+  endDate     DateTime
+  employeeIds String[]
+  employees   Employee[]
+  tasks       Task[]
+  tweets      Tweet[]
 }
 
 model Employee {
   id        String     @id @default(uuid())
   name      String  
   position  String  
-  periods   Period[] 
+  email     String     @unique
   schedules Schedule[]
   tasks     Task[] 
   messages  Tweet[]
+  periodId  String
+  period     Period    @relation(fields: [periodId], references: [id])
+
 }
 
-model Shift {
-  id         String    @id @default(uuid())
-  name       String
-  schedules  Schedule[]
-}
+// model Shift {
+//   id         String    @id @default(uuid())
+//   name       String
+//   schedules  Schedule[]
+// }
 
 model Schedule {
   id         String    @id @default(uuid())
-  date       DateTime
-  shiftId    String
-  shift      Shift     @relation(fields: [shiftId], references: [id])
+  dates      DateTime
+  // shiftId    String
+  // shift      Shift     @relation(fields: [shiftId], references: [id])
+  shiftName  String
+  // shiftValue String
   employeeId String
   employee   Employee  @relation(fields: [employeeId], references: [id])
-  periodId   String
-  period     Period    @relation(fields: [periodId], references: [id])
+
 }
+
+// model DateArr {
+//   id          String @id @default(uuid())
+//   scheduleId  String
+//   schedule    Schedule  @relation(fields: [scheduleId], references: [id])
+// }
 
 model Task {
   id         String    @id @default(uuid())
@@ -88,3 +98,4 @@ model TweetReply {
   standFormat String
   comment     String?
 }
+
