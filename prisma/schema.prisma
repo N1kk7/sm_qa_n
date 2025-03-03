@@ -43,14 +43,12 @@ model Employee {
 // }
 
 model Schedule {
-  id         String    @id @default(uuid())
-  dates      DateTime
-  // shiftId    String
-  // shift      Shift     @relation(fields: [shiftId], references: [id])
-  shiftName  String
-  // shiftValue String
-  employeeId String
-  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  id            String    @id @default(uuid())
+  employeeId    String
+  date          String
+  workShift     String
+  shiftPosition String
+  employee      Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
 }
 
@@ -73,17 +71,19 @@ model Schedule {
 
 model Tweet {
   id          String   @id @default(uuid())
-  date        DateTime
+  // date        DateTime
   employeeId  String
   employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   firstTimeSt String  //First Reply Timestamp
   taskStatus  String  //Task status
   complTimeSt String // Complete Timestamp
   timestamp   String // Timestamp
+  date        String
+  time        String
   connectProf String? // Connected profile
   complBy     String  // Completed By
   network     String  // Network
-  message     String  // Message
+  message     String?  // Message
   nativeLink  String
   permalink   String
   periodId    String

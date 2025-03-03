@@ -1,3 +1,4 @@
+// import period from '@/server/api/period';
 import { defineStore } from 'pinia'
 import { computed, reactive } from 'vue'
 
@@ -49,73 +50,265 @@ export const useDataStore = defineStore('data', () => {
 
           console.log(data, 'answersObj')
 
-        //   const uploadData = async () => {
+          const uploadData = async () => {
 
-        //     // console.log(scheduleObj, 'scheduleObj')
-        //     if (!data.length) {
-        //         console.log('no data')
-        //     }
-
-        //     try {
-
-        //         if (!data.scheduleObj?.length) {
-        //             alert('Please put file with schedule');
-        //             return;
-        //         };
-
-        //         const fromData = new FormData();
-
-        // //   console.log(answersObj, 'answersObj')
+            let uploadedArr = [];
+            let periodId = '';
 
 
-        //         data.scheduleObj.forEach((item) => {
-        //             fromData.append('schedule[]', JSON.stringify(item));
-        //         })
 
-        //         const fetchSchedule = await fetch('/api/period?period=schedule', {
-        //             method: 'POST',
-        //             body: fromData
-        //         })
-
-        //         const res = await fetchSchedule.json();
-
-        //         console.log(res, 'fetchSchedule')
-
-
-        //     } catch (err) {
-        //         console.log(err)
-        //     }
-        //   }
-
-        //   uploadData();
-
-          const uploadAnswers = async () => {
-
-            if (!data.answersObj?.length) {
-                alert('Some problem with answers file');
-                return;
+            if (!data.length) {
+                console.log('no data')
             }
 
-            const fromData = new FormData();
+            try {
 
-            data.answersObj.forEach((item) => {
-                fromData.append('answers[]', JSON.stringify(item));
-            })
+                if (!data.scheduleObj?.length) {
+                    alert('Please put file with schedule');
+                    return;
+                };
 
-            const fetchAnswers = await fetch('/api/period?period=answers', {
-                method: 'POST',
-                body: fromData
-            })
-
-            const res = await fetchAnswers.json();
-
-            console.log(res, 'fetchAnswers')
+                const fromData = new FormData();
 
 
+                data.scheduleObj.forEach((item) => {
+                    fromData.append('schedule[]', JSON.stringify(item));
+                })
 
+                const fetchSchedule = await fetch('/api/period?period=schedule', {
+                    method: 'POST',
+                    body: fromData
+                })
+
+                const res = await fetchSchedule.json();
+
+                // console.log(res)
+
+                uploadedArr = res;
+                periodId = res.periodId
+
+                console.log(uploadedArr, 1)
+
+                if (!data.answersObj?.length) {
+                    alert('Some problem with answers file');
+                    return;
+                }
+
+                const tweetData = new FormData(); 
+
+                // const matchShift = (tweetTime, shift) => {
+
+                //   // console.log(tweetTime, shift, 'matchShift')
+                //   const [shiftStart, shiftEnd] = shift.split(" - ");
+
+
+                //   const parseTime = (time) => {
+                //     const [hours, minutes] = time.split(':');
+                //     return hours * 60 + minutes;
+                //   }
+
+                //   const tweetedTime = parseTime(tweetTime);
+                //   const startTime = parseTime(shiftStart);
+                //   const endTime = parseTime(shiftEnd);
+
+                //   if (startTime < endTime ) {
+                //     return tweetedTime >=startTime && tweetedTime < endTime;
+                //   } else {
+                //     return tweetedTime >= startTime || tweetedTime < endTime
+                //   }
+
+
+
+                // }
+
+                // const filledArr = [];
+
+                // data.answersObj.forEach((tweet) => {
+
+                //   const timestamp = tweet["Timestamp (EET)"];
+                //   if (!timestamp) {
+                //     console.error("Ошибка: отсутствует Timestamp (EET) в твите:", tweet);
+                //     return;
+                  
+                //   }
+                //   const [tweetDate, tweetTime] = timestamp.split(" ");
+
+                // // console.log(uploadedArr, 2)
+
+
+                //   const employee = uploadedArr.data.find((emp) => {
+
+                //     const shiftRegex = /^\d{2}:\d{2} - \d{2}:\d{2}$/;
+
+                //     const validShift = shiftRegex.test(emp.workShift);
+
+                //     if (!validShift) {
+                //       return;
+                //     }
+
+                //     emp.date === tweetDate && matchShift(tweetTime, emp.workShift)
+
+
+
+                //     return {
+                //       ...emp,
+                //       ...tweet
+                //     }
+                //   })
+
+                //   filledArr.push(employee)
+
+                //   if (employee) {
+                //     filledArr.push({
+                //       ...employee,
+                //       ...tweet
+                //     })
+                //   }
+
+
+
+                // })
+
+
+                const matchShift = (tweetTime, shift) => {
+                  const [shiftStart, shiftEnd] = shift.split(" - ");
+              
+                  const parseTime = (time) => {
+                      const [hours, minutes] = time.split(":").map(Number);
+                      return hours * 60 + minutes;
+                  };
+              
+                  const tweetedTime = parseTime(tweetTime);
+                  const startTime = parseTime(shiftStart);
+                  const endTime = parseTime(shiftEnd);
+              
+                  if (startTime < endTime) {
+                      return tweetedTime >= startTime && tweetedTime < endTime;
+                  } else {
+                      return tweetedTime >= startTime || tweetedTime < endTime;
+                  }
+              };
+              
+              const filledArr = [];
+
+              console.log(periodId, 'periodId')
+              
+              data.answersObj.forEach((tweet) => {
+                  const timestamp = tweet["Timestamp (EET)"];
+                  if (!timestamp) {
+                      console.error("Timestamp not found", tweet);
+                      return;
+                  }
+              
+                  const [tweetDate, tweetTime] = timestamp.split(" ");
+              
+                  const employee = uploadedArr.data.find((emp) => {
+                      const shiftRegex = /^\d{2}:\d{2} - \d{2}:\d{2}$/;
+              
+                      if (!shiftRegex.test(emp.workShift)) {
+                          return false; 
+                      }
+              
+                      return emp.date === tweetDate && matchShift(tweetTime, emp.workShift);
+                  });
+              
+                  if (employee) {
+                      tweetData.append('answers[]', JSON.stringify({
+                          employeeId: employee.employeeId,
+                          firstTimeSt: tweet["First Reply Timestamp"],
+                          taskStatus: tweet["Task Status"],
+                          complTimeSt: tweet["Completed Timestamp"],
+                          timestamp: tweet["Timestamp (EET)"],
+                          date: tweetDate,
+                          time: tweetTime,
+                          connectProf: tweet["Connected Profile"],
+                          complBy: tweet["Completed By"],
+                          network: tweet["Network"],
+                          message: tweet["Message"],
+                          nativeLink: tweet["Native Permalink"],
+                          permalink: tweet["Permalink"],
+                          periodId: periodId
+                      }))
+                      // filledArr.push({
+                      //     // ...employee,
+                      //     // ...tweet
+                      //     employeeId: employee.employeeId,
+                      //     firstTimeSt: tweet["First Reply Timestamp"],
+                      //     taskStatus: tweet["Task Status"],
+                      //     complTimeSt: tweet["Completed Timestamp"],
+                      //     timestamp: tweet["Timestamp (EET)"],
+                      //     date: tweetDate,
+                      //     time: tweetTime,
+                      //     connectProf: tweet["Connected Profile"],
+                      //     complBy: tweet["Completed By"],
+                      //     network: tweet["Network"],
+                      //     message: tweet["Message"],
+                      //     nativeLink: tweet["Native Permalink"],
+                      //     permalink: tweet["Permalink"],
+                      //     periodId: ''
+
+                      // });
+                  }
+              });
+
+
+              // const uploadAnswers = await fetch('/api/period?period=answers', {
+              //   method: 'POST',
+              //   body: tweetData
+              // })
+
+              // const resUploadAnswers = await uploadAnswers.json();
+
+              // console.log(resUploadAnswers, 'resUploadAnswers')
+              
+              // console.log(filledArr, "filledArr");
+              
+
+                // console.log(filledArr, 'filledArr')
+
+
+                // console.log(res, 'fetchSchedule data');
+                return {
+                  data: res
+                }
+
+
+            } catch (err) {
+                console.log(err)
+            }
           }
 
-          uploadAnswers();
+          uploadData();
+
+          // const uploadAnswers = async () => {
+
+          //   if (!data.answersObj?.length) {
+          //       alert('Some problem with answers file');
+          //       return;
+          //   }
+
+          //   const fromData = new FormData();
+
+          //   console.log(uploadData.data, 'uploadData.data')
+
+          //   // data.answersObj.forEach((item) => {
+          //   //     fromData.append('answers[]', JSON.stringify(item));
+          //   // })
+
+          //   // const fetchAnswers = await fetch('/api/period?period=answers', {
+          //   //     method: 'POST',
+          //   //     body: fromData
+          //   // })
+
+          //   // const res = await fetchAnswers.json();
+
+          //   // console.log(res, 'fetchAnswers')
+
+
+
+          // }
+
+          // uploadAnswers();
         }
       })
     }

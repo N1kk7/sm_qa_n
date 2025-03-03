@@ -77,10 +77,21 @@ async function uploadSchedule(event) {
             // console.log(employeeId, 'employeeId')
 
             dateKeys.forEach((key) => {
+
+                const date = new Date(key);
+                const formattedDate = date.toLocaleDateString('fr-CA');
+
+                const separateKey = item[key].match(/^(.+?)\s*(\((.+)\))?$/);
+
+                const workShift = separateKey ? separateKey[1].trim() : '';
+                const shiftPosition = separateKey && separateKey[3] ? separateKey[3].trim() : '';
+
+
                 scheduleArr.push({
                     employeeId: employeeId,
-                    dates: new Date(key).toISOString(),
-                    shiftName: item[key]
+                    date: formattedDate,
+                    workShift: workShift,
+                    shiftPosition: shiftPosition,
                 })
             })
 
@@ -126,7 +137,7 @@ async function uploadSchedule(event) {
 
                     })
 
-                    console.log('inserted chunk');
+                    // console.log('inserted chunk');
                     
 
 
@@ -145,8 +156,12 @@ async function uploadSchedule(event) {
         //     data: scheduleArr,
         //     skipDuplicates: true
         // })
+        // console.log
 
-        return {data: insertScheduleChunk}
+        return {
+            data: scheduleArr,
+            periodId: periodId,
+        }
 
         // console.log()
 
